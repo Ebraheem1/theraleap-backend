@@ -2,7 +2,6 @@ var Therapist = require('../models/Therapist');
 var Patient = require('../models/Patient');
 
 let therapistAdapter = {
-
     createTherapist: function(therapist, cb) {
       var therapist = new Therapist(therapist);
       therapist.save(cb);
@@ -16,6 +15,9 @@ let therapistAdapter = {
     },
     updateData: function(query, updates) {
 
+    },
+    getTherapist: function(query, cb) {
+      Therapist.findOne(query, cb);
     }
 };
 module.exports = therapistAdapter;
