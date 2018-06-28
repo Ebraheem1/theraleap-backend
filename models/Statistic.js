@@ -8,11 +8,11 @@ var Statistic = new Schema({
     required: true
   },
   patient_id:{
-    type: mongoose.Schema.Types.ObjectId, 
+    type: mongoose.Schema.Types.ObjectId,
     ref:'Patient'
   },
   therapist_id: {
-    type: mongoose.Schema.Types.ObjectId, 
+    type: mongoose.Schema.Types.ObjectId,
     ref:'Therapist'
   },
   scatter_WA: [Number],

@@ -1,15 +1,14 @@
 {
   "name": "theraleap-api",
   "version": "0.1.0",
-  "scripts": {
-    "start": "webpack-dev-server"
-  },
   "author": "Yasmine & Ebraheem",
   "license": "ISC",
   "devDependencies": {},
   "dependencies": {
+    "bcrypt": "^2.0.1",
     "body-parser": "^1.18.3",
     "cors": "^2.8.4",
+    "dotenv": "^6.0.0",
     "express": "^4.16.3",
     "mongoose": "^5.1.7",
     "nodemon": "^1.17.5"

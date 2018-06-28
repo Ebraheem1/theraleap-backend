@@ -17,7 +17,7 @@ var Patient = new Schema({
       required: true
   },
   therapist_id: {
-    type: mongoose.Schema.Types.ObjectId, 
+    type: mongoose.Schema.Types.ObjectId,
     ref:'Therapist'
   },
   TI_threshold: Number,
