@@ -51,15 +51,20 @@ let therapistController = {
         }
         if(result){
           //token code goes here
-          delete therapist.password;
-          const payload = { user: therapist, type: '1'};
+          var sessionUser = {
+            email: therapist.email,
+            name: therapist.name,
+            id: therapist._id,
+            type: '1'
+          }
+          const payload = { user: sessionUser};
           let token = jwt.sign(payload, process.env.APPSECRET, {
                   expiresIn: 60*60*24 // expires in 24 hours
                 });
-          res.status(200).json({success: true, token: token});
+          res.status(200).json({success: true, token: token, user: sessionUser});
         }
         else{
-          res.status(400).json({success: false, message: 'Invalid Password'});
+          res.status(400).send({success: false, message: 'Invalid Password'});
         }
       })
     })
@@ -70,7 +75,7 @@ let therapistController = {
     var body = req.body;
     if(body.name && body.email && body.password) {
       bcrypt.hash(body.password, parseInt(process.env.SALT), function(err, hash) {
-        patient = { name: body.name, email: body.email, password: hash };
+        patient = { name: body.name, email: body.email, password: hash, therapist_id: req.useId };
         therapistAdapter.createPatient(patient, function(err) {
           // if(err) return res.status(400).json({'message':'Unable to save to database'});
           if(err) return res.status(400).send("unable to save");

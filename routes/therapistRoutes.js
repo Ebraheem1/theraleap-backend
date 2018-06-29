@@ -10,29 +10,35 @@ const jwt = require("jsonwebtoken");
 therapistRoutes.post('/login', therapistController.login);
 
 //Ensure Authentication Middleware
-// therapistRoutes.use(function(req, res, next) {
-//   let token =
-//         req.body.token || req.query.token || req.headers["x-access-token"];
-//   if(token) {
-//     jwt.verify(token, process.env.APPSECRET, function(err, decoded) {
-//       if (err) {
-//         return res.json({
-//           success: false,
-//           message: "Failed to authenticate token."
-//         });
-//       } else {
-//         // if everything is good, save to request for use in other routes
-//         req.decoded = decoded;
-//         next();
-//       }
-//     });
-//   } else {
-//     return res.status(403).send({
-//       success: false,
-//       message: "No token provided."
-//     });
-//   }
-// });
+therapistRoutes.use(function(req, res, next) {
+  let token =
+        req.body.token || req.query.token || req.headers["x-access-token"];
+  if(token) {
+    jwt.verify(token, process.env.APPSECRET, function(err, decoded) {
+      if (err) {
+        return res.json({
+          success: false,
+          message: "Failed to authenticate token."
+        });
+      }else if(decoded.user.type != '1')
+      {
+        return res.status(401).send({
+          success: false,
+          message: 'UnAuthorized Access'
+        });
+      }
+      else {
+        req.userId = decoded.user.id;
+        next();
+      }
+    });
+  } else {
+    return res.status(403).send({
+      success: false,
+      message: "No token provided."
+    });
+  }
+});
 
 therapistRoutes.post('/create', therapistController.createTherapist);
 therapistRoutes.post('/create_patient', therapistController.createPatient);

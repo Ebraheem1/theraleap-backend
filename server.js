@@ -6,7 +6,8 @@ const express = require('express'),
       cors = require('cors'),
       mongoose = require('mongoose'),
       config = require('./config/DB'),
-      therapistRoutes = require('./routes/therapistRoutes');
+      therapistRoutes = require('./routes/therapistRoutes'),
+      patientRoutes = require('./routes/patientRoutes');
 
 
 mongoose.Promise = global.Promise;
@@ -22,6 +23,8 @@ app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(cors());
 app.use('/therapist', therapistRoutes);
+app.use('/patient', patientRoutes);
+
 
 const port = process.env.PORT || 4000;
 
