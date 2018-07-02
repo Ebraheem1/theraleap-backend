@@ -1,6 +1,8 @@
 var bcrypt = require('bcrypt');
 var therapistAdapter = require('../adapters/therapistAdapter');
 var patientAdapter = require('../adapters/patientAdapter');
+var statisticAdapter = require('../adapters/statisticAdapter');
+
 const jwt = require("jsonwebtoken");
 
 let therapistController = {
@@ -123,8 +125,25 @@ let therapistController = {
       }
       res.status(200).json({success: true, patient: patient});
     });
-  }
+  },
+  getPatientStatistics: function(req, res)
+  {
+    console.log(req.params);
+    if(req.params.id && req.params.enabled_gesture)
+    {
+      console.log('hena okay');
+      var query = {patient_id: req.params.id, classifier_name: req.body.enabled_gesture};
+      statisticAdapter.getPatientStatistic(query, function(err, data)
+      {
+        if(err)
+        {
+          res.status(400).send({success: false, message: "Internal Error"});
+        }
 
+        res.status(200).json({success: true, graphs: data});
+      })
+    }
+  }
 };
 
 module.exports = therapistController;
