@@ -7,6 +7,7 @@ const express = require('express'),
       mongoose = require('mongoose'),
       config = require('./config/DB'),
       therapistRoutes = require('./routes/therapistRoutes'),
+      statisticRoutes = require('./routes/statisticRoutes'),
       patientRoutes = require('./routes/patientRoutes');
 
 
@@ -24,6 +25,7 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use('/therapist', therapistRoutes);
 app.use('/patient', patientRoutes);
+app.use('/statistic', statisticRoutes);
 
 
 const port = process.env.PORT || 4000;

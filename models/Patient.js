@@ -22,8 +22,8 @@ var Patient = new Schema({
   },
   TI_threshold: Number,
   WA_thresholds: [Number],
-  WA_handType: String,
-  enabled_gesture: String
+  WA_handType: String, // left OR right
+  enabled_gesture: String //WristAngleClassifier OR ThumbIndexClassifier
 },{
     collection: 'patients'
 });
