@@ -23,6 +23,7 @@ var Patient = new Schema({
   TI_threshold: Number,
   WA_thresholds: [Number],
   WA_handType: String,
+  WA_difficulty: String,
   enabled_gesture: String
 },{
     collection: 'patients'
