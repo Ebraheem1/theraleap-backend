@@ -1,5 +1,8 @@
 var bcrypt = require('bcrypt');
 var therapistAdapter = require('../adapters/therapistAdapter');
+var patientAdapter = require('../adapters/patientAdapter');
+var statisticAdapter = require('../adapters/statisticAdapter');
+
 const jwt = require("jsonwebtoken");
 
 let therapistController = {
@@ -18,9 +21,7 @@ let therapistController = {
       bcrypt.hash(body.password, parseInt(process.env.SALT), function(err, hash) {
         therapist = { name: body.name, email: body.email, password: hash };
         therapistAdapter.createTherapist(therapist, function(err) {
-          // if(err) return res.status(400).json({'message':'Unable to save to database'});
           if(err) {
-            console.log(err);
             return res.status(400).send("Unable to save to database");
           }
           res.status(200).json({'message': 'Saved successfully'});
@@ -69,19 +70,77 @@ let therapistController = {
       })
     })
   },
-
   createPatient: function(req, res) {
     //add therapist_id
     var body = req.body;
     if(body.name && body.email && body.password) {
       bcrypt.hash(body.password, parseInt(process.env.SALT), function(err, hash) {
-        patient = { name: body.name, email: body.email, password: hash, therapist_id: req.useId };
+        patient = { name: body.name, email: body.email, password: hash, therapist_id: req.userId };
         therapistAdapter.createPatient(patient, function(err) {
-          // if(err) return res.status(400).json({'message':'Unable to save to database'});
           if(err) return res.status(400).send("unable to save");
           res.status(200).json({'message': 'Saved successfully'});
         });
       });
+    }
+  },
+  viewPatients: function(req, res)
+  {
+    patientAdapter.getPatients({ therapist_id: req.userId}, function(err, patients)
+    {
+      if(err)
+      {
+        res.status(400).send({success: false, message: "Internal Error"});
+      }
+      let resPatients = [];
+      if(patients.length > 0)
+      {
+        for(var i = 0; i < patients.length; i++)
+        {
+          resPatients[i] = {
+            id: patients[i]._id,
+            name: patients[i].name,
+            enabled_gesture: patients[i].enabled_gesture,
+            therapist_id: patients[i].therapist_id,
+            TI_threshold: patients[i].TI_threshold,
+            WA_thresholds: patients[i].WA_thresholds,
+            WA_handType: patients[i].WA_handType,
+            email: patients[i].email,
+            WA_difficulty: patients[i].WA_difficulty
+          };
+        }
+      }
+      res.status(200).json({ success: true, patients: resPatients});
+    });
+  },
+  savePatientInfo: function(req, res)
+  {
+    var updates = req.body;
+    var query = {id: req.body.id};
+    updates.id = undefined;
+    patientAdapter.updatePatient(query, updates, {new:true}, function(err, patient)
+    {
+      if(err)
+      {
+        res.status(400).send({success: false, message: "Internal Error"});
+      }
+      res.status(200).json({success: true, patient: patient});
+    });
+  },
+  getPatientStatistics: function(req, res)
+  {
+    console.log(req.params);
+    if(req.params.id && req.params.enabled_gesture)
+    {
+      var query = {patient_id: req.params.id, classifier_name: req.params.enabled_gesture};
+      statisticAdapter.getPatientStatistic(query, function(err, data)
+      {
+        if(err)
+        {
+          res.status(400).send({success: false, message: "Internal Error"});
+        }
+
+        res.status(200).json({success: true, graphs: data});
+      })
     }
   }
 };
