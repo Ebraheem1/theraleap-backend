@@ -5,22 +5,23 @@ const jwt = require("jsonwebtoken");
 let patientController = {
   login: function(req, res)
   {
+    if(!req.body.email || !req.body.password) return res.status(400).send({message: "Complete Missing Fields"});
     var query = { email: req.body.email };
     patientAdapter.getPatient(query, function(err, patient)
     {
       if(err)
       {
-        res.status(400).send({success: false, message: 'Internal error'});
+        return res.status(400).send({success: false, message: 'Internal error'});
       }
       if(!patient)
       {
-        res.status(404).send({success: false, message: 'Email not found'});
+        return res.status(404).send({success: false, message: 'Email not found'});
       }
       bcrypt.compare(req.body.password, patient.password, function(err, result)
       {
         if(err)
         {
-          res.status(400).send({success: false, message: 'Internal error'});
+          return res.status(400).send({success: false, message: 'Internal error'});
         }
         if(result){
           //token code goes here
@@ -39,15 +40,15 @@ let patientController = {
           let token = jwt.sign(payload, process.env.APPSECRET, {
                   expiresIn: 60*60*24 // expires in 24 hours
                 });
-          res.status(200).json({success: true, token: token, user: sessionUser});
+          return res.status(200).json({success: true, token: token, user: sessionUser});
         }
         else{
-          res.status(400).send({success: false, message: 'Invalid Password'});
+          return res.status(400).send({success: false, message: 'Invalid Password'});
         }
       })
     })
   },
-  
+
 }
 
 module.exports = patientController;

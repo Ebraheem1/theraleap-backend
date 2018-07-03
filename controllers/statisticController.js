@@ -6,9 +6,9 @@ let statisticController = {
     var stat = req.body;
     statisticAdapter.create(stat, function(err) {
       if(err){
-        return res.status(400).send("unable to save");
+        return res.status(400).send({message: "unable to save"});
       }
-      res.status(200).json({'success': true,'message': 'Saved successfully'});
+      return res.status(200).json({success: true, message: 'Saved successfully'});
     });
   },
 
