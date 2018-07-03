@@ -7,7 +7,7 @@ let statisticAdapter = {
     },
     getPatientStatistic: function(query, cb)
     {
-      Statistic.find(query, cb);
+      Statistic.find(query, null, {sort: {createdAt: -1}}, cb);
     }
 };
 
