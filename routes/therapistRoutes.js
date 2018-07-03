@@ -41,7 +41,6 @@ therapistRoutes.use(function(req, res, next) {
 });
 
 therapistRoutes.post('/create_patient', therapistController.createPatient);
-
 therapistRoutes.get('/view-patients', therapistController.viewPatients);
 therapistRoutes.post('/edit-patient', therapistController.savePatientInfo);
 therapistRoutes.get('/get-statistics/:id/:enabled_gesture', therapistController.getPatientStatistics);
