@@ -8,7 +8,8 @@ const express = require('express'),
       config = require('./config/DB'),
       therapistRoutes = require('./routes/therapistRoutes'),
       statisticRoutes = require('./routes/statisticRoutes'),
-      patientRoutes = require('./routes/patientRoutes');
+      patientRoutes = require('./routes/patientRoutes'),
+      expressValidator = require('express-validator');
 
 
 mongoose.Promise = global.Promise;
@@ -23,9 +24,27 @@ const app = express();
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(cors());
+//express-validator
+app.use(expressValidator({
+    errorFormatter: function(param, msg, value) {
+        var namespace = param.split('.'),
+            root = namespace.shift(),
+            formParam = root;
+
+        while (namespace.length) {
+            formParam += '[' + namespace.shift() + ']';
+        }
+        return {
+            param: formParam,
+            msg: msg,
+            value: value
+        };
+    }
+}));
 app.use('/therapist', therapistRoutes);
 app.use('/patient', patientRoutes);
 app.use('/statistic', statisticRoutes);
+
 
 
 const port = process.env.PORT || 4000;

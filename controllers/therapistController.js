@@ -9,22 +9,28 @@ let therapistController = {
   createTherapist: function(req, res) {
     var body = req.body;
 
-    if(!body.name) return res.status(400).send("Name is required");
-    if(!body.email) return res.status(400).send("Email is required");
-    if(!body.password) return res.status(400).send("Password is required");
-
+    if(!body.name) return res.status(400).send({message: "Name is required"});
+    if(!body.email) return res.status(400).send({message: "Email is required"});
+    if(!body.password) return res.status(400).send({message: "Password is required"});
+    req.checkBody('email','Email is in wrong format').isEmail();
+    req.checkBody('password', 'Password at least 3 characters and at most 8').len(3, 8);
+    var errors = req.validationErrors();
+    if(errors)
+    {
+      return res.status(400).send({success: false, errors: errors});
+    }
     var query = { email: body.email };
     therapistAdapter.getTherapist(query, function(err, therapist) {
-      if(err) return res.status(400).send("Internal Error");
-      if(therapist) return res.status(400).send("Email is already registered");
+      if(err) return res.status(400).send({message: "Internal Error"});
+      if(therapist) return res.status(400).send({message: "Email is already registered"});
 
       bcrypt.hash(body.password, parseInt(process.env.SALT), function(err, hash) {
         therapist = { name: body.name, email: body.email, password: hash };
         therapistAdapter.createTherapist(therapist, function(err) {
           if(err) {
-            return res.status(400).send("Unable to save to database");
+            return res.status(400).send({message: "Unable to save to database"});
           }
-          res.status(200).json({'message': 'Saved successfully'});
+          res.status(200).json({message: 'Saved successfully'});
         });
       });
     })
@@ -74,6 +80,12 @@ let therapistController = {
     //add therapist_id
     var body = req.body;
     if(body.name && body.email && body.password) {
+      req.checkBody('email',' Email is in wrong format').isEmail();
+      var errors = req.validationErrors();
+      if(errors)
+      {
+        res.status(400).send({success: false, errors: errors})
+      }
       bcrypt.hash(body.password, parseInt(process.env.SALT), function(err, hash) {
         patient = { name: body.name, email: body.email, password: hash, therapist_id: req.userId };
         therapistAdapter.createPatient(patient, function(err) {
