@@ -80,6 +80,7 @@ let therapistController = {
     //add therapist_id
     var body = req.body;
     if(body.name && body.email && body.password) {
+      console.log(body);
       req.checkBody('email',' Email is in wrong format').isEmail();
       var errors = req.validationErrors();
       if(errors)
@@ -154,6 +155,24 @@ let therapistController = {
         res.status(200).json({success: true, graphs: data});
       })
     }
+  },
+  getPatientInfo: function(req, res)
+  {
+    var query = { _id: req.params.id };
+    patientAdapter.getPatient(query, function(err, patient)
+    {
+      if(err)
+      {
+        return res.status(400).send({message: "Internal Error"});
+      }
+      if(! patient)
+      {
+        return res.status(404).send({message: "Invalid Patient"});
+      }
+      else{
+        return res.status(200).json({success: true, patient: patient})
+      }
+    })
   }
 };
 
