@@ -39,22 +39,25 @@ let therapistController = {
   },
 
   login: function(req, res) {
+    if(! req.body.email || ! req.body.password){
+      return res.status(400).send({message: 'Complete the missing fields'});
+    }
     var query = { email: req.body.email };
     therapistAdapter.getTherapist(query, function(err, therapist)
     {
       if(err)
       {
-        res.status(400).send({success: false, message: 'Internal error'});
+        return res.status(400).send({success: false, message: 'Internal error'});
       }
       if(!therapist)
       {
-        res.status(404).send({success: false, message: 'Email not found'});
+        return res.status(404).send({success: false, message: 'Email not found'});
       }
       bcrypt.compare(req.body.password, therapist.password, function(err, result)
       {
         if(err)
         {
-          res.status(400).send({success: false, message: 'Internal error'});
+          return res.status(400).send({success: false, message: 'Internal error'});
         }
         if(result){
           //token code goes here
@@ -68,10 +71,10 @@ let therapistController = {
           let token = jwt.sign(payload, process.env.APPSECRET, {
                   expiresIn: 60*60*24 // expires in 24 hours
                 });
-          res.status(200).json({success: true, token: token, user: sessionUser});
+          return res.status(200).json({success: true, token: token, user: sessionUser});
         }
         else{
-          res.status(400).send({success: false, message: 'Invalid Password'});
+          return res.status(400).send({success: false, message: 'Invalid Password'});
         }
       })
     })
@@ -85,13 +88,13 @@ let therapistController = {
       var errors = req.validationErrors();
       if(errors)
       {
-        res.status(400).send({success: false, errors: errors})
+        return res.status(400).send({success: false, errors: errors})
       }
       bcrypt.hash(body.password, parseInt(process.env.SALT), function(err, hash) {
         patient = { name: body.name, email: body.email, password: hash, therapist_id: req.userId };
         therapistAdapter.createPatient(patient, function(err) {
-          if(err) return res.status(400).send("unable to save");
-          res.status(200).json({'message': 'Saved successfully'});
+          if(err) return res.status(400).send({message: "unable to save"});
+          return res.status(200).json({success: true, message: 'Saved successfully'});
         });
       });
     }
@@ -102,7 +105,7 @@ let therapistController = {
     {
       if(err)
       {
-        res.status(400).send({success: false, message: "Internal Error"});
+        return res.status(400).send({success: false, message: "Internal Error"});
       }
       let resPatients = [];
       if(patients.length > 0)
@@ -122,7 +125,7 @@ let therapistController = {
           };
         }
       }
-      res.status(200).json({ success: true, patients: resPatients});
+      return res.status(200).json({ success: true, patients: resPatients});
     });
   },
   savePatientInfo: function(req, res)
@@ -134,14 +137,14 @@ let therapistController = {
     {
       if(err)
       {
-        res.status(400).send({success: false, message: "Internal Error"});
+        return res.status(400).send({success: false, message: "Internal Error"});
       }
-      res.status(200).json({success: true, patient: patient});
+      return res.status(200).json({success: true, patient: patient});
     });
   },
   getPatientStatistics: function(req, res)
   {
-    console.log(req.params);
+
     if(req.params.id && req.params.enabled_gesture)
     {
       var query = {patient_id: req.params.id, classifier_name: req.params.enabled_gesture};
@@ -149,10 +152,10 @@ let therapistController = {
       {
         if(err)
         {
-          res.status(400).send({success: false, message: "Internal Error"});
+          return res.status(400).send({success: false, message: "Internal Error"});
         }
 
-        res.status(200).json({success: true, graphs: data});
+        return res.status(200).json({success: true, graphs: data});
       })
     }
   },
