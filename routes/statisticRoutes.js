@@ -12,6 +12,12 @@ statisticRoutes.use(function(req, res, next) {
   if(token) {
     jwt.verify(token, process.env.APPSECRET, function(err, decoded) {
       if (err) {
+        if(err.message == 'jwt expired')
+        {
+          return res.status(401).send({
+            message: 'jwt expired'
+          });
+        }
         return res.json({
           success: false,
           message: "Failed to authenticate token."

@@ -7,7 +7,6 @@ var therapistController = require('../controllers/therapistController');
 const jwt = require("jsonwebtoken");
 
 therapistRoutes.post('/login', therapistController.login);
-therapistRoutes.post('/create', therapistController.createTherapist);
 
 //Ensure Authentication Middleware
 therapistRoutes.use(function(req, res, next) {
@@ -16,7 +15,13 @@ therapistRoutes.use(function(req, res, next) {
   if(token) {
     jwt.verify(token, process.env.APPSECRET, function(err, decoded) {
       if (err) {
-        return res.json({
+        if(err.message == 'jwt expired')
+        {
+          return res.status(401).send({
+            message: 'jwt expired'
+          });
+        }
+        return res.status(400).send({
           success: false,
           message: "Failed to authenticate token."
         });
@@ -39,7 +44,7 @@ therapistRoutes.use(function(req, res, next) {
     });
   }
 });
-
+therapistRoutes.post('/create', therapistController.createTherapist);
 therapistRoutes.post('/create_patient', therapistController.createPatient);
 therapistRoutes.get('/view-patients', therapistController.viewPatients);
 therapistRoutes.post('/edit-patient', therapistController.savePatientInfo);
