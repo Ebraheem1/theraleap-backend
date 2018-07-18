@@ -71,7 +71,6 @@ let therapistController = {
           let token = jwt.sign(payload, process.env.APPSECRET, {
                   expiresIn: 60*60*24 // expires in 24 hours
                 });
-          console.log('Done');
           return res.status(200).json({success: true, token: token, user: sessionUser});
         }
         else{
